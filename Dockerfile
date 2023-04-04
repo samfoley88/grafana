@@ -62,7 +62,7 @@ COPY pkg pkg
 COPY scripts scripts
 COPY conf conf
 COPY .github .github
-COPY .git .git
+# COPY .git .git
 
 RUN make build-go GO_BUILD_TAGS=${GO_BUILD_TAGS} WIRE_TAGS=${WIRE_TAGS}
 
