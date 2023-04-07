@@ -1,22 +1,34 @@
 FROM ubuntu:20.04
 
-# Install necessary packages
-RUN apt-get update && \
-    apt-get install -y curl git make && \
-    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    curl -sSf https://dl.google.com/go/go1.16.3.linux-amd64.tar.gz | tar -C /usr/local -xz && \
-    export PATH=$PATH:/usr/local/go/bin && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-    # apt-get update && apt-get install -y yarn
-    npm install -g yarn
+# Commands to include:
+# Install required utils
+RUN apt-get update && apt-get install -y wget make curl
+
+# Install Go
+WORKDIR /tmp/goinstall
+RUN wget https://go.dev/dl/go1.20.3.linux-amd64.tar.gz
+RUN tar -xvf go1.20.3.linux-amd64.tar.gz 
+# RUN rm -R /usr/local/go
+RUN mv go /usr/local
+RUN echo "export GOROOT=/usr/local/go" >> ~/.bashrc
+RUN echo "export GOPATH=$HOME/go" >> ~/.bashrc
+RUN echo "export PATH=$GOPATH/bin:$GOROOT/bin:$PATH" >> ~/.bashrc
+
+# Install node
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash &&\
+apt-get install -y nodejs
+
+
+# Install yarn
+RUN npm install -g yarn
+
+
 
 # Set environment variables
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Verify installation
-RUN go version && make --version && yarn --version
+# RUN go version && make --version && yarn --version
 
 # Set working directory
 WORKDIR /app
@@ -32,3 +44,8 @@ RUN yarn install --immutable
 
 # Run application
 # CMD ["./app"]
+
+
+# # Latest commands from history: 
+# sudo -E "PATH=$PATH" /home/ubuntu/.nvm/versions/node/v18.15.0/lib/node_modules/yarn/bin/yarn.js start
+# make run
